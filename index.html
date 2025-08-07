@@ -32,6 +32,21 @@ body {
   margin: -4px auto;
 }
 
+#player-bg-artwork {
+  position: fixed;
+  top: -30px;
+  right: -30px;
+  bottom: -30px;
+  left: -30px;
+  background-image: url("https://raw.githubusercontent.com/himalayasingh/music-player-1/master/img/_1.jpg");
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: 50%;
+  filter: blur(40px);
+  -webkit-filter: blur(40px);
+  z-index: 1;
+}
+
 #player-bg-layer {
   position: fixed;
   top: 0;
@@ -312,6 +327,7 @@ body {
 </style>
 </head>
 <body>
+<div id="player-bg-artwork"></div>
 <div id="player-bg-layer"></div>
 <div id="player-container">
   <div id="player">
@@ -343,7 +359,6 @@ body {
         <div id="buffer-box">Buffering ...</div>
       </div>
 
-
       <div id="player-controls">
         <div class="control">
           <div class="button" id="play-previous">
@@ -368,6 +383,7 @@ body {
 <script>
 $(function () {
   const playerTrack = $("#player-track");
+  const bgArtwork = $("#player-bg-artwork");
   const albumName = $("#album-name");
   const trackName = $("#track-name");
   const albumArt = $("#album-art");
@@ -592,7 +608,8 @@ $(function () {
       $("#" + currArtwork).addClass("active");
 
       bgArtworkUrl = $("#" + currArtwork).attr("src");
-      
+
+      bgArtwork.css({ "background-image": "url(" + bgArtworkUrl + ")" });
     } else {
       if (flag == 0 || flag == 1) --currIndex;
       else ++currIndex;
@@ -630,5 +647,4 @@ $(function () {
 });
 </script>
 </body>
-
 </html>
