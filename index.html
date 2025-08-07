@@ -316,7 +316,6 @@ body {
 </style>
 </head>
 <body>
-<div id="player-bg-artwork"></div>
 <div id="player-bg-layer"></div>
 <div id="player-container">
   <div id="player">
@@ -598,8 +597,7 @@ $(function () {
       $("#" + currArtwork).addClass("active");
 
       bgArtworkUrl = $("#" + currArtwork).attr("src");
-
-      bgArtwork.css({ "background-image": "url(" + bgArtworkUrl + ")" });
+      
     } else {
       if (flag == 0 || flag == 1) --currIndex;
       else ++currIndex;
@@ -639,4 +637,5 @@ $(function () {
 </body>
 
 </html>
+
 
