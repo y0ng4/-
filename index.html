@@ -1,6 +1,6 @@
 <html>
 <head>
-<link rel='stylesheet' href='https://use.fontawesome.com/releases/v5.3.1/css/all.css'>
+<link rel='stylesheet' href='https://use.fontawesome.com/releases/v5.3.1/css/all.css'><link rel="stylesheet" href="./style.css">
 <style>
 * {
   font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
@@ -11,11 +11,15 @@
 
 body {
   margin: 0;
-  background-color: transparent; /* 배경 제거 */
+  background-color: #f1f9f9;
 }
-
 *:focus {
   outline: none;
+}
+
+body {
+  margin: 0;
+  background-color: #ffeff5;
 }
 
 #player-container {
@@ -28,7 +32,16 @@ body {
   margin: -4px auto;
 }
 
-/* #player-bg-layer 제거 */
+#player-bg-layer {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background-color: #fff;
+  opacity: 0.5;
+  z-index: 2;
+}
 
 #player {
   position: relative;
@@ -295,9 +308,11 @@ body {
 .button:hover i {
   color: #fff;
 }
+
 </style>
 </head>
 <body>
+<div id="player-bg-layer"></div>
 <div id="player-container">
   <div id="player">
     <div id="player-track">
@@ -314,6 +329,11 @@ body {
       </div>
     </div>
     <div id="player-content">
+
+
+
+
+      <!-- 앨범 이미지를 넣는 곳 -->
       <div id="album-art">
         <img id="_1" src="https://raw.githubusercontent.com/y0ng4/-/7a99a18413833b95f543a4958516f273e33c096c/1.jpg" alt="이미지">
         <img id="_2" src="https://raw.githubusercontent.com/y0ng4/-/7a99a18413833b95f543a4958516f273e33c096c/1.jpg" alt="이미지">
@@ -322,6 +342,8 @@ body {
         <img id="_5" src="https://raw.githubusercontent.com/y0ng4/-/7a99a18413833b95f543a4958516f273e33c096c/1.jpg" alt="이미지">
         <div id="buffer-box">Buffering ...</div>
       </div>
+
+
       <div id="player-controls">
         <div class="control">
           <div class="button" id="play-previous">
@@ -360,6 +382,7 @@ $(function () {
   const playPreviousTrackButton = $("#play-previous");
   const playNextTrackButton = $("#play-next");
 
+  // 곡 이름
   const albums = [
     "민들레",
     "민들레",
@@ -368,6 +391,10 @@ $(function () {
     "민들레"
   ];
 
+
+
+
+  // 가수 이름
   const trackNames = [
     "OOHYO 우효",
     "OOHYO 우효",
@@ -376,6 +403,8 @@ $(function () {
     "OOHYO 우효"
   ];
 
+
+  // MP3 링크 
   const albumArtworks = ["_1", "_2", "_3", "_4", "_5"];
   const trackUrl = [
     "https://raw.githubusercontent.com/y0ng4/-/1bf0585f6a8634489b9aa8c9d80a04d6963bd3bf/OOHYO%20우효-민들레.mp3",
@@ -409,7 +438,6 @@ $(function () {
       if (audio.paused) {
         playerTrack.addClass("active");
         albumArt.addClass("active");
-        clearInterval(buffInterval);
         checkBuffering();
         i.attr("class", "fas fa-pause");
         audio.play();
@@ -438,18 +466,23 @@ $(function () {
 
     if (ctMinutes < 0 || ctSeconds < 0) return;
 
-    if (ctMinutes > 0) {
-      ctMinutes = ctMinutes < 10 ? "0" + ctMinutes : ctMinutes;
-      ctSeconds = ctSeconds < 10 ? "0" + ctSeconds : ctSeconds;
-      seekTime.text(ctMinutes + ":" + ctSeconds).css({ left: seekT, display: "block" });
-    } else {
-      seekTime.text("00:" + ctSeconds).css({ left: seekT, display: "block" });
-    }
+    if (ctMinutes < 0 || ctSeconds < 0) return;
+
+    if (ctMinutes < 10) ctMinutes = "0" + ctMinutes;
+    if (ctSeconds < 10) ctSeconds = "0" + ctSeconds;
+
+    if (isNaN(ctMinutes) || isNaN(ctSeconds)) seekTime.text("--:--");
+    else seekTime.text(ctMinutes + ":" + ctSeconds);
+
+    seekTime.css({ left: seekT, "margin-left": "-21px" }).fadeIn(0);
   }
 
   function hideHover() {
-    seekTime.css({ display: "none" });
     sHover.width(0);
+    seekTime
+      .text("00:00")
+      .css({ left: "0px", "margin-left": "0px" })
+      .fadeOut(0);
   }
 
   function playFromClickedPos() {
@@ -459,8 +492,13 @@ $(function () {
   }
 
   function updateCurrTime() {
-    nTime = audio.currentTime * (100 / audio.duration);
-    seekBar.width(nTime + "%");
+    nTime = new Date();
+    nTime = nTime.getTime();
+
+    if (!tFlag) {
+      tFlag = true;
+      trackTime.addClass("active");
+    }
 
     curMinutes = Math.floor(audio.currentTime / 60);
     curSeconds = Math.floor(audio.currentTime - curMinutes * 60);
@@ -476,80 +514,121 @@ $(function () {
     if (durMinutes < 10) durMinutes = "0" + durMinutes;
     if (durSeconds < 10) durSeconds = "0" + durSeconds;
 
-    tProgress.text(curMinutes + ":" + curSeconds);
-    tTime.text(durMinutes + ":" + durSeconds);
+    if (isNaN(curMinutes) || isNaN(curSeconds)) tProgress.text("00:00");
+    else tProgress.text(curMinutes + ":" + curSeconds);
 
-    if (audio.currentTime === audio.duration) {
-      i.attr("class", "fas fa-play");
-      if (currIndex < albums.length - 1) {
-        currIndex++;
-        playTrack(currIndex);
-      } else {
-        audio.pause();
-        currIndex = -1;
-      }
+    if (isNaN(durMinutes) || isNaN(durSeconds)) tTime.text("00:00");
+    else tTime.text(durMinutes + ":" + durSeconds);
+
+    if (
+      isNaN(curMinutes) ||
+      isNaN(curSeconds) ||
+      isNaN(durMinutes) ||
+      isNaN(durSeconds)
+    )
+      trackTime.removeClass("active");
+    else trackTime.addClass("active");
+
+    seekBar.width(playProgress + "%");
+
+    if (playProgress == 100) {
+      i.attr("class", "fa fa-play");
+      seekBar.width(0);
+      tProgress.text("00:00");
+      albumArt.removeClass("buffering").removeClass("active");
+      clearInterval(buffInterval);
     }
   }
 
   function checkBuffering() {
     clearInterval(buffInterval);
     buffInterval = setInterval(function () {
-      if (bTime === 0 || audio.currentTime > bTime) {
-        albumArt.removeClass("buffering");
-      } else {
-        albumArt.addClass("buffering");
-      }
-      bTime = audio.currentTime;
+      if (nTime == 0 || bTime - nTime > 1000) albumArt.addClass("buffering");
+      else albumArt.removeClass("buffering");
+
+      bTime = new Date();
+      bTime = bTime.getTime();
     }, 100);
   }
 
-  function selectTrack(index) {
-    if (index < 0 || index >= albums.length) return;
-    currIndex = index;
-    playTrack(currIndex);
+  function selectTrack(flag) {
+    if (flag == 0 || flag == 1) ++currIndex;
+    else --currIndex;
+
+    if (currIndex > -1 && currIndex < albumArtworks.length) {
+      if (flag == 0) i.attr("class", "fa fa-play");
+      else {
+        albumArt.removeClass("buffering");
+        i.attr("class", "fa fa-pause");
+      }
+
+      seekBar.width(0);
+      trackTime.removeClass("active");
+      tProgress.text("00:00");
+      tTime.text("00:00");
+
+      currAlbum = albums[currIndex];
+      currTrackName = trackNames[currIndex];
+      currArtwork = albumArtworks[currIndex];
+
+      audio.src = trackUrl[currIndex];
+
+      nTime = 0;
+      bTime = new Date();
+      bTime = bTime.getTime();
+
+      if (flag != 0) {
+        audio.play();
+        playerTrack.addClass("active");
+        albumArt.addClass("active");
+
+        clearInterval(buffInterval);
+        checkBuffering();
+      }
+
+      albumName.text(currAlbum);
+      trackName.text(currTrackName);
+      albumArt.find("img.active").removeClass("active");
+      $("#" + currArtwork).addClass("active");
+
+      bgArtworkUrl = $("#" + currArtwork).attr("src");
+      
+    } else {
+      if (flag == 0 || flag == 1) --currIndex;
+      else ++currIndex;
+    }
   }
 
-  function playTrack(index) {
-    audio.src = trackUrl[index];
-    audio.load();
-    albumName.text(albums[index]);
-    trackName.text(trackNames[index]);
-    albumArt.find("img").removeClass("active");
-    albumArt.find("#" + albumArtworks[index]).addClass("active");
-    playPauseButton.find("i").attr("class", "fas fa-pause");
-    audio.play();
-    playerTrack.addClass("active");
-    albumArt.addClass("active");
+  function initPlayer() {
+    audio = new Audio();
+
+    selectTrack(0);
+
+    audio.loop = false;
+
+    playPauseButton.on("click", playPause);
+
+    sArea.mousemove(function (event) {
+      showHover(event);
+    });
+
+    sArea.mouseout(hideHover);
+
+    sArea.on("click", playFromClickedPos);
+
+    $(audio).on("timeupdate", updateCurrTime);
+
+    playPreviousTrackButton.on("click", function () {
+      selectTrack(-1);
+    });
+    playNextTrackButton.on("click", function () {
+      selectTrack(1);
+    });
   }
 
-  let audio = new Audio();
-
-  playPauseButton.on("click", playPause);
-  sArea.mousemove(showHover);
-  sArea.mouseleave(hideHover);
-  sArea.on("click", playFromClickedPos);
-  playPreviousTrackButton.on("click", function () {
-    if (currIndex > 0) {
-      currIndex--;
-      playTrack(currIndex);
-    }
-  });
-  playNextTrackButton.on("click", function () {
-    if (currIndex < albums.length - 1) {
-      currIndex++;
-      playTrack(currIndex);
-    }
-  });
-
-  audio.addEventListener("timeupdate", updateCurrTime);
-  audio.addEventListener("ended", function () {
-    playNextTrackButton.click();
-  });
-
-  // 시작할 때 첫 트랙 재생 대기 없이 로드만
-  selectTrack(0);
-  audio.pause();
+  initPlayer();
 });
 </script>
 </body>
+
 </html>
