@@ -3,193 +3,389 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>픽셀 아트 네온 플레이리스트</title>
+<title>Music Player</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
 
-  body {
-    margin: 0;
-    background: linear-gradient(135deg, #3a2a52, #1a1a2e);
+  *, *::before, *::after {
+    box-sizing: border-box;
+  }
+
+  html, body {
+    margin: 0; padding: 0;
+    width: 100%; height: 100%;
+    background: transparent; /* 완전 투명 */
     font-family: 'Press Start 2P', cursive;
-    color: #eee;
-    width: 360px;
-    padding: 20px;
-    border-radius: 16px;
-    overflow: hidden;
   }
 
-  .track {
-    position: relative;
+  body {
     display: flex;
+    justify-content: center;
     align-items: center;
-    background: rgba(255 255 255 / 0.1);
-    margin-bottom: 20px;
-    border-radius: 12px;
-    padding: 10px 16px;
-    box-shadow: 0 0 10px #7f5af0cc;
+    padding: 1em;
+    min-height: 100vh;
+    overflow: visible;
   }
 
-  .track:nth-child(1) {
-    background: rgba(255 192 203 / 0.15);
-    box-shadow: 0 0 12px #ff79c6;
-  }
-  .track:nth-child(2) {
-    background: rgba(147 112 219 / 0.15);
-    box-shadow: 0 0 12px #a18fff;
-  }
-  .track:nth-child(3) {
-    background: rgba(106 154 250 / 0.15);
-    box-shadow: 0 0 12px #74c0fc;
-  }
-
-  .art {
-    width: 80px;
-    height: 80px;
-    border-radius: 8px;
-    overflow: hidden;
-    flex-shrink: 0;
-    margin-left: auto;
-  }
-
-  .art img {
+  .player {
     width: 100%;
-    height: 100%;
-    image-rendering: pixelated;
+    max-width: 300px;
+    background: rgba(26, 26, 26, 0.85);
+    color: #ff0000;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 1em 1.5em;
+    user-select: none;
+    border-radius: 8px;
+    box-shadow: 0 0 10px #ff0000aa;
   }
 
-  .info {
-    flex-grow: 1;
-    margin-right: 20px;
+  .now-playing-container {
+    text-align: center;
+    color: white;
+    text-shadow: 0 0 6px #ff0000;
+    font-size: 0.5rem;
+    line-height: 1.2;
+  }
+  #songTitle {
+    display: block;
+    font-size: 0.8rem;
+    margin-top: 0.3em;
+  }
+
+  .progress-time {
+    min-width: 3em;
+    font-size: 0.5rem;
     user-select: none;
   }
 
-  .title {
-    font-size: 14px;
-    letter-spacing: 0.07em;
-    color: #fff;
-    text-shadow:
-      0 0 4px #f72585,
-      0 0 10px #f72585;
-    margin: 0;
-  }
-
-  .artist {
-    font-size: 10px;
-    margin: 2px 0 10px 0;
-    color: #d8b4fe;
-    text-shadow:
-      0 0 3px #b794f4,
-      0 0 6px #b794f4;
+  .progress-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 0.5em;
+    margin-top: 0.8em;
   }
 
   .progress-container {
+    flex-grow: 1;
     position: relative;
-    height: 8px;
-    background: #2a1a3a;
-    border-radius: 6px;
-    overflow: hidden;
+    height: 0.6em;
+    background: rgba(255,0,0,0.15);
+    border-radius: 0.3em;
+    cursor: pointer;
   }
 
-  .progress {
-    height: 100%;
-    background: linear-gradient(90deg, #ff79c6, #a18fff, #74c0fc);
-    width: 0;
-    animation: progressAnimation 240s linear forwards;
+  .progress-bar {
+    position: absolute;
+    height: 90%;
+    background: linear-gradient(90deg, white, red);
+    width: 0%;
+    border-radius: 0.3em;
   }
 
-  @keyframes progressAnimation {
-    0% { width: 0; }
-    100% { width: 100%; }
+  .progress-thumb {
+    position: absolute;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 1em;
+    height: 1em;
+    border: 0.15em solid #ff0000;
+    border-radius: 50%;
+    background: transparent;
+    cursor: pointer;
   }
 
-  /* 네온 깜빡임 */
-  .neon-flicker {
-    animation: flicker 3s infinite alternate;
-  }
-
-  @keyframes flicker {
-    0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% {
-      opacity: 1;
-      text-shadow:
-        0 0 8px #f72585,
-        0 0 20px #f72585,
-        0 0 30px #f72585,
-        0 0 40px #f72585,
-        0 0 50px #f72585;
-    }
-    20%, 22%, 24%, 55% {
-      opacity: 0.5;
-      text-shadow: none;
-    }
-  }
-
-  /* 컨트롤 아이콘 */
   .controls {
     display: flex;
     justify-content: center;
-    margin-top: 8px;
-    user-select: none;
-    color: #ddd;
+    gap: 1em;
+    margin-top: 1em;
+    align-items: center;
   }
-
-  .controls > span {
-    margin: 0 12px;
-    font-size: 16px;
+  .controls button {
+    background: transparent;
+    border: none;
+    font-size: 1rem; /* 버튼 크기 살짝 축소 */
+    color: #ff0000;
     cursor: pointer;
-    filter: drop-shadow(0 0 1px #a18fff);
+    user-select: none;
+    padding: 0;
+    line-height: 1;
+  }
+  .controls button:focus {
+    outline: none;
   }
 
+  /* 음량 바를 음소거 버튼 옆에 가로 배치 */
+  .volume-container {
+    width: 50px; /* 음량바 길이 50px */
+    height: 0.4em;
+    display: inline-block;
+  }
+  .volume-slider {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 0.4em;
+    border-radius: 0.2em;
+    background: rgba(255, 0, 0, 0.3);
+    cursor: pointer;
+    outline: none;
+  }
+  .volume-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 1em;
+    height: 1em;
+    border-radius: 50%;
+    background: #ff0000;
+    cursor: pointer;
+    border: none;
+    margin-top: -0.3em;
+  }
+  .volume-slider::-moz-range-thumb {
+    width: 1em;
+    height: 1em;
+    border-radius: 50%;
+    background: #ff0000;
+    cursor: pointer;
+    border: none;
+  }
+
+  @media (max-width: 350px) {
+    .player {
+      padding: 0.75em 1em;
+    }
+    .now-playing-container {
+      font-size: 0.85rem;
+    }
+    .controls button {
+      font-size: 0.9rem;
+    }
+    .progress-time {
+      font-size: 0.7rem;
+      min-width: 2.5em;
+    }
+    .volume-container {
+      width: 40px;
+    }
+  }
 </style>
 </head>
 <body>
 
-  <div class="track" style="--neon-color: #ff79c6;">
-    <div class="info">
-      <p class="title neon-flicker">CANDY CANDY</p>
-      <p class="artist neon-flicker" style="animation-delay: 0.4s;">Kyary Pamyu Panyu</p>
-      <div class="progress-container">
-        <div class="progress"></div>
-      </div>
-      <div class="controls">
-        <span>🔁</span><span>⏮️</span><span>⏸️</span><span>⏭️</span><span>🔀</span>
-      </div>
+<div class="player" id="player">
+
+  <div class="now-playing-container">
+    Now Playing…
+    <span id="songTitle"></span>
+  </div>
+
+  <div class="progress-wrapper">
+    <div id="timeCurrent" class="progress-time">00:00</div>
+
+    <div class="progress-container" id="progressContainer">
+      <div class="progress-bar" id="progressBar"></div>
+      <div class="progress-thumb" id="progressThumb"></div>
     </div>
-    <div class="art">
-      <img src="https://i.imgur.com/3eTzLQx.png" alt="Candy Candy pixel art" />
+
+    <div id="timeRemaining" class="progress-time">00:00</div>
+  </div>
+
+  <div class="controls">
+    <button id="btnRepeat" title="다시 듣기">🔁</button>
+    <button id="btnPrev" title="이전 곡">⏮️</button>
+    <button id="btnPlay" title="재생/정지">▶️</button>
+    <button id="btnNext" title="다음 곡">⏭️</button>
+    <button id="btnMute" title="음소거">🔈</button>
+    <div class="volume-container">
+      <input type="range" id="volumeSlider" class="volume-slider" min="0" max="1" step="0.01" value="1" />
     </div>
   </div>
 
-  <div class="track" style="--neon-color: #a18fff;">
-    <div class="info">
-      <p class="title neon-flicker" style="animation-delay: 0.8s;">데자부 (Deja Vu)</p>
-      <p class="artist neon-flicker" style="animation-delay: 1.2s;">드림캐쳐 (Dreamcatcher)</p>
-      <div class="progress-container">
-        <div class="progress" style="animation-delay: 5s;"></div>
-      </div>
-      <div class="controls">
-        <span>🔁</span><span>⏮️</span><span>⏸️</span><span>⏭️</span><span>🔀</span>
-      </div>
-    </div>
-    <div class="art">
-      <img src="https://i.imgur.com/0cLgq7O.png" alt="Deja Vu pixel art" />
-    </div>
-  </div>
+</div>
 
-  <div class="track" style="--neon-color: #74c0fc;">
-    <div class="info">
-      <p class="title neon-flicker" style="animation-delay: 1.6s;">かいじゅうのマーチ</p>
-      <p class="artist neon-flicker" style="animation-delay: 2s;">米津玄師 (Yonezu Kenshi)</p>
-      <div class="progress-container">
-        <div class="progress" style="animation-delay: 10s;"></div>
-      </div>
-      <div class="controls">
-        <span>🔁</span><span>⏮️</span><span>⏸️</span><span>⏭️</span><span>🔀</span>
-      </div>
-    </div>
-    <div class="art">
-      <img src="https://i.imgur.com/VmvT8E4.png" alt="Kaijuu no March pixel art" />
-    </div>
-  </div>
+<script>
+  // 스크립트는 변경 필요 없으니 그대로 두세요
+  const playlist = [
+    { src: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3', title: '민들레 - 우효' },
+    { src: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3', title: '민들레 - 우효' },
+    { src: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3', title: '민들레 - 우효' }
+  ];
+
+  let currentIndex = 0;
+  let isPlaying = false;
+  let isRepeat = false;
+  const audio = new Audio();
+  audio.src = playlist[currentIndex].src;
+
+  const btnPlay = document.getElementById('btnPlay');
+  const btnRepeat = document.getElementById('btnRepeat');
+  const btnPrev = document.getElementById('btnPrev');
+  const btnNext = document.getElementById('btnNext');
+  const btnMute = document.getElementById('btnMute');
+  const progressBar = document.getElementById('progressBar');
+  const progressThumb = document.getElementById('progressThumb');
+  const progressContainer = document.getElementById('progressContainer');
+  const timeCurrent = document.getElementById('timeCurrent');
+  const timeRemaining = document.getElementById('timeRemaining');
+  const songTitle = document.getElementById('songTitle');
+  const volumeSlider = document.getElementById('volumeSlider');
+
+  function formatTime(seconds) {
+    if (isNaN(seconds)) return '00:00';
+    const m = Math.floor(seconds / 60);
+    const s = Math.floor(seconds % 60);
+    return `${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
+  }
+
+  function updateNowPlaying() {
+    songTitle.textContent = playlist[currentIndex].title;
+  }
+
+  function loadSong(index) {
+    currentIndex = index;
+    audio.src = playlist[currentIndex].src;
+    audio.load();
+    timeCurrent.textContent = '00:00';
+    timeRemaining.textContent = '00:00';
+    progressBar.style.width = '0%';
+    progressThumb.style.left = '0px';
+    updateNowPlaying();
+    if(isPlaying) {
+      audio.play();
+      btnPlay.textContent = '⏸️';
+    } else {
+      btnPlay.textContent = '▶️';
+    }
+  }
+
+  audio.addEventListener('loadedmetadata', () => {
+    timeRemaining.textContent = formatTime(audio.duration);
+  });
+
+  audio.addEventListener('timeupdate', () => {
+    if(!isDragging) {
+      const progressPercent = (audio.currentTime / audio.duration) * 100;
+      progressBar.style.width = progressPercent + '%';
+      const containerWidth = progressContainer.clientWidth;
+      progressThumb.style.left = (containerWidth * progressPercent / 100) + 'px';
+
+      timeCurrent.textContent = formatTime(audio.currentTime);
+      timeRemaining.textContent = formatTime(audio.duration - audio.currentTime);
+    }
+  });
+
+  audio.addEventListener('ended', () => {
+    if(isRepeat) {
+      audio.currentTime = 0;
+      audio.play();
+    } else {
+      nextSong();
+    }
+  });
+
+  btnPlay.addEventListener('click', () => {
+    if(isPlaying) {
+      audio.pause();
+      btnPlay.textContent = '▶️';
+    } else {
+      audio.play();
+      btnPlay.textContent = '⏸️';
+    }
+    isPlaying = !isPlaying;
+  });
+
+  btnRepeat.addEventListener('click', () => {
+    isRepeat = !isRepeat;
+    btnRepeat.style.color = isRepeat ? '#fff000' : '#ff0000';
+  });
+
+  function prevSong() {
+    currentIndex = (currentIndex - 1 + playlist.length) % playlist.length;
+    loadSong(currentIndex);
+  }
+  btnPrev.addEventListener('click', prevSong);
+
+  function nextSong() {
+    currentIndex = (currentIndex + 1) % playlist.length;
+    loadSong(currentIndex);
+  }
+  btnNext.addEventListener('click', nextSong);
+
+  btnMute.addEventListener('click', () => {
+    audio.muted = !audio.muted;
+    btnMute.textContent = audio.muted ? '🔇' : '🔈';
+    if(!audio.muted) {
+      volumeSlider.value = audio.volume;
+    }
+  });
+
+  volumeSlider.addEventListener('input', (e) => {
+    audio.volume = e.target.value;
+    audio.muted = false;
+    btnMute.textContent = '🔈';
+  });
+
+  progressContainer.addEventListener('click', (e) => {
+    const rect = progressContainer.getBoundingClientRect();
+    const clickX = e.clientX - rect.left;
+    const newTime = (clickX / rect.width) * audio.duration;
+    audio.currentTime = newTime;
+  });
+
+  let isDragging = false;
+
+  function onDragStart(e) {
+    e.preventDefault();
+    isDragging = true;
+  }
+
+  function onDragMove(e) {
+    if(!isDragging) return;
+    let clientX;
+    if(e.type.startsWith('touch')) {
+      clientX = e.touches[0].clientX;
+    } else {
+      clientX = e.clientX;
+    }
+    const rect = progressContainer.getBoundingClientRect();
+    let posX = clientX - rect.left;
+    posX = Math.min(Math.max(posX, 0), rect.width);
+    const newTime = (posX / rect.width) * audio.duration;
+
+    progressBar.style.width = (posX / rect.width) * 100 + '%';
+    progressThumb.style.left = posX + 'px';
+    timeCurrent.textContent = formatTime(newTime);
+    timeRemaining.textContent = formatTime(audio.duration - newTime);
+  }
+
+  function onDragEnd(e) {
+    if(!isDragging) return;
+    let clientX;
+    if(e.type.startsWith('touch')) {
+      clientX = e.changedTouches[0].clientX;
+    } else {
+      clientX = e.clientX;
+    }
+    const rect = progressContainer.getBoundingClientRect();
+    let posX = clientX - rect.left;
+    posX = Math.min(Math.max(posX, 0), rect.width);
+    const newTime = (posX / rect.width) * audio.duration;
+    audio.currentTime = newTime;
+    isDragging = false;
+  }
+
+  progressThumb.addEventListener('mousedown', onDragStart);
+  window.addEventListener('mousemove', onDragMove);
+  window.addEventListener('mouseup', onDragEnd);
+
+  progressThumb.addEventListener('touchstart', onDragStart);
+  window.addEventListener('touchmove', onDragMove);
+  window.addEventListener('touchend', onDragEnd);
+
+  loadSong(currentIndex);
+</script>
 
 </body>
 </html>
