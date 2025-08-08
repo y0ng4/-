@@ -3,141 +3,193 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>화이트 도트 플레이리스트</title>
+<title>픽셀 아트 네온 플레이리스트</title>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Nanum+Pen+Script&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
 
   body {
     margin: 0;
+    background: linear-gradient(135deg, #3a2a52, #1a1a2e);
+    font-family: 'Press Start 2P', cursive;
+    color: #eee;
+    width: 360px;
     padding: 20px;
-    background: #fff;
-    font-family: 'Nanum Pen Script', cursive;
-    color: #333;
-    position: relative;
+    border-radius: 16px;
     overflow: hidden;
-    border-radius: 15px;
-    width: 320px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
   }
 
-  /* 도트 배경 */
-  body::before {
-    content: '';
-    position: absolute;
-    top: 10px;
-    left: 10px;
-    width: 300px;
-    height: 300px;
-    background-image:
-      radial-gradient(#ddd 6%, transparent 7%),
-      radial-gradient(#ddd 6%, transparent 7%);
-    background-position: 0 0, 15px 15px;
-    background-size: 30px 30px;
-    opacity: 0.3;
-    pointer-events: none;
-    z-index: 0;
-  }
-
-  h2 {
-    margin-top: 0;
-    font-weight: 400;
-    font-size: 24px;
-    text-align: center;
-    color: #444;
-    z-index: 1;
+  .track {
     position: relative;
-  }
-
-  ul.playlist {
-    list-style: none;
-    padding: 0;
-    margin: 20px 0 0;
-    z-index: 1;
-    position: relative;
-  }
-
-  ul.playlist li {
-    background: #f9f9f9;
-    border-radius: 12px;
-    padding: 12px 16px;
-    margin-bottom: 12px;
-    box-shadow: 0 2px 6px rgba(200, 200, 200, 0.4);
     display: flex;
     align-items: center;
-    cursor: pointer;
-    transition: background-color 0.2s ease;
+    background: rgba(255 255 255 / 0.1);
+    margin-bottom: 20px;
+    border-radius: 12px;
+    padding: 10px 16px;
+    box-shadow: 0 0 10px #7f5af0cc;
   }
 
-  ul.playlist li:hover {
-    background-color: #e6f0ff;
+  .track:nth-child(1) {
+    background: rgba(255 192 203 / 0.15);
+    box-shadow: 0 0 12px #ff79c6;
+  }
+  .track:nth-child(2) {
+    background: rgba(147 112 219 / 0.15);
+    box-shadow: 0 0 12px #a18fff;
+  }
+  .track:nth-child(3) {
+    background: rgba(106 154 250 / 0.15);
+    box-shadow: 0 0 12px #74c0fc;
   }
 
-  ul.playlist li .dot {
-    width: 14px;
-    height: 14px;
-    background: #a0c4ff;
-    border-radius: 50%;
-    margin-right: 14px;
+  .art {
+    width: 80px;
+    height: 80px;
+    border-radius: 8px;
+    overflow: hidden;
     flex-shrink: 0;
-    box-shadow: 0 0 6px #a0c4ff;
+    margin-left: auto;
   }
 
-  ul.playlist li .song-info {
+  .art img {
+    width: 100%;
+    height: 100%;
+    image-rendering: pixelated;
+  }
+
+  .info {
     flex-grow: 1;
+    margin-right: 20px;
+    user-select: none;
   }
 
-  ul.playlist li .song-title {
-    font-size: 16px;
-    font-weight: 600;
-    margin: 0 0 4px 0;
-    color: #333;
-  }
-
-  ul.playlist li .song-artist {
-    font-size: 12px;
-    color: #777;
+  .title {
+    font-size: 14px;
+    letter-spacing: 0.07em;
+    color: #fff;
+    text-shadow:
+      0 0 4px #f72585,
+      0 0 10px #f72585;
     margin: 0;
   }
+
+  .artist {
+    font-size: 10px;
+    margin: 2px 0 10px 0;
+    color: #d8b4fe;
+    text-shadow:
+      0 0 3px #b794f4,
+      0 0 6px #b794f4;
+  }
+
+  .progress-container {
+    position: relative;
+    height: 8px;
+    background: #2a1a3a;
+    border-radius: 6px;
+    overflow: hidden;
+  }
+
+  .progress {
+    height: 100%;
+    background: linear-gradient(90deg, #ff79c6, #a18fff, #74c0fc);
+    width: 0;
+    animation: progressAnimation 240s linear forwards;
+  }
+
+  @keyframes progressAnimation {
+    0% { width: 0; }
+    100% { width: 100%; }
+  }
+
+  /* 네온 깜빡임 */
+  .neon-flicker {
+    animation: flicker 3s infinite alternate;
+  }
+
+  @keyframes flicker {
+    0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% {
+      opacity: 1;
+      text-shadow:
+        0 0 8px #f72585,
+        0 0 20px #f72585,
+        0 0 30px #f72585,
+        0 0 40px #f72585,
+        0 0 50px #f72585;
+    }
+    20%, 22%, 24%, 55% {
+      opacity: 0.5;
+      text-shadow: none;
+    }
+  }
+
+  /* 컨트롤 아이콘 */
+  .controls {
+    display: flex;
+    justify-content: center;
+    margin-top: 8px;
+    user-select: none;
+    color: #ddd;
+  }
+
+  .controls > span {
+    margin: 0 12px;
+    font-size: 16px;
+    cursor: pointer;
+    filter: drop-shadow(0 0 1px #a18fff);
+  }
+
 </style>
 </head>
 <body>
-  <h2>나만의 플레이리스트</h2>
-  <ul class="playlist">
-    <li>
-      <div class="dot"></div>
-      <div class="song-info">
-        <p class="song-title">봄날</p>
-        <p class="song-artist">방탄소년단</p>
+
+  <div class="track" style="--neon-color: #ff79c6;">
+    <div class="info">
+      <p class="title neon-flicker">CANDY CANDY</p>
+      <p class="artist neon-flicker" style="animation-delay: 0.4s;">Kyary Pamyu Panyu</p>
+      <div class="progress-container">
+        <div class="progress"></div>
       </div>
-    </li>
-    <li>
-      <div class="dot"></div>
-      <div class="song-info">
-        <p class="song-title">좋은 날</p>
-        <p class="song-artist">아이유</p>
+      <div class="controls">
+        <span>🔁</span><span>⏮️</span><span>⏸️</span><span>⏭️</span><span>🔀</span>
       </div>
-    </li>
-    <li>
-      <div class="dot"></div>
-      <div class="song-info">
-        <p class="song-title">Palette</p>
-        <p class="song-artist">아이유(feat. G-DRAGON)</p>
+    </div>
+    <div class="art">
+      <img src="https://i.imgur.com/3eTzLQx.png" alt="Candy Candy pixel art" />
+    </div>
+  </div>
+
+  <div class="track" style="--neon-color: #a18fff;">
+    <div class="info">
+      <p class="title neon-flicker" style="animation-delay: 0.8s;">데자부 (Deja Vu)</p>
+      <p class="artist neon-flicker" style="animation-delay: 1.2s;">드림캐쳐 (Dreamcatcher)</p>
+      <div class="progress-container">
+        <div class="progress" style="animation-delay: 5s;"></div>
       </div>
-    </li>
-    <li>
-      <div class="dot"></div>
-      <div class="song-info">
-        <p class="song-title">Feel Special</p>
-        <p class="song-artist">TWICE</p>
+      <div class="controls">
+        <span>🔁</span><span>⏮️</span><span>⏸️</span><span>⏭️</span><span>🔀</span>
       </div>
-    </li>
-    <li>
-      <div class="dot"></div>
-      <div class="song-info">
-        <p class="song-title">Dynamite</p>
-        <p class="song-artist">방탄소년단</p>
+    </div>
+    <div class="art">
+      <img src="https://i.imgur.com/0cLgq7O.png" alt="Deja Vu pixel art" />
+    </div>
+  </div>
+
+  <div class="track" style="--neon-color: #74c0fc;">
+    <div class="info">
+      <p class="title neon-flicker" style="animation-delay: 1.6s;">かいじゅうのマーチ</p>
+      <p class="artist neon-flicker" style="animation-delay: 2s;">米津玄師 (Yonezu Kenshi)</p>
+      <div class="progress-container">
+        <div class="progress" style="animation-delay: 10s;"></div>
       </div>
-    </li>
-  </ul>
+      <div class="controls">
+        <span>🔁</span><span>⏮️</span><span>⏸️</span><span>⏭️</span><span>🔀</span>
+      </div>
+    </div>
+    <div class="art">
+      <img src="https://i.imgur.com/VmvT8E4.png" alt="Kaijuu no March pixel art" />
+    </div>
+  </div>
+
 </body>
 </html>
